@@ -82,8 +82,9 @@ def exibir_dados_formatados(dados):
         print("=" * 50 + "\n")
 
 # ID's dos docentes lá no scholar, padrão é user=XXXXXXXX no final da URL
-# ids_professores = ["QZFWzugAAAAJ", "1P_SzY0AAAAJ"]
-ids_professores = ["1P_SzY0AAAAJ"]
+# ids_professores = ["QZFWzugAAAAJ", "1P_SzY0AAAAJ"] -> Alan e Delano 😎
+# ids_professores = ["1P_SzY0AAAAJ"] -> Delano 🥳
+ids_professores = ["G-__GDUAAAAJ"] # -> Fredy 🧐
 dados_professores = obter_dados_professor(ids_professores)
 
 # printa os resultados
