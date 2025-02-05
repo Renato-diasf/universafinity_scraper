@@ -2,6 +2,11 @@ import time
 from scholarly import scholarly
 import requests
 from bs4 import BeautifulSoup
+import networkx as nx
+import matplotlib.pyplot as plt
+
+from grafo_coautoria import gerar_grafo_coautoria
+
 
 def obter_dados_professor(ids_professores):
     """
@@ -29,7 +34,8 @@ def obter_dados_professor(ids_professores):
             nome = perfil_info.get("name", "N/A")
             coautores = [coautor.get("name", "N/A") for coautor in perfil_info.get("coauthors", [])]
             publicacoes = perfil_info.get("publications", [])
-            
+            all_coautores = set(coautores)  # Inicializa com os coautores do perfil
+
             # VARIAVEL PARA DEBUGAR (IGNORAR)
             teste = 1
 
@@ -37,6 +43,7 @@ def obter_dados_professor(ids_professores):
             for pub in publicacoes:
                 pub_info = scholarly.fill(pub)
                 # define local e abstract como N/A para pegar posteriormente na pagina especifica do trab.
+                trabalho_coautores = []
                 trabalho = {
                     "titulo": pub_info.get("bib", {}).get("title", "N/A"),
 
@@ -93,18 +100,22 @@ def obter_dados_professor(ids_professores):
                                     trabalho["local"] = valor_texto  
                                 elif "journal" in campo_texto or "revista" in campo_texto:
                                     trabalho["local"] = valor_texto  
-                                elif "editora" in campo_texto or "publisher" in campo_texto:
-                                    trabalho["local"] = valor_texto
-                                elif "páginas" in campo_texto or "pages" in campo_texto:
-                                    trabalho["local"] = valor_texto
                                 elif "book" in campo_texto or "livro" in campo_texto:
                                     trabalho["local"] = valor_texto
                                 elif "publicações" in campo_texto:
                                     trabalho["local"] = valor_texto
+                                elif "editora" in campo_texto or "publisher" in campo_texto:
+                                    trabalho["local"] = valor_texto
 
                                 # acha os coautores de cada trabalho
                                 if "autores" in campo_texto:
-                                    trabalho["coautores"] = valor_texto
+                                    trabalho["coautores"] = [nome.strip() for nome in valor_texto.split(",")]
+
+
+                                
+                                trabalho_coautores = [nome.strip() for nome in valor_texto.split(",")]
+                                all_coautores.update(trabalho["coautores"])
+
 
                                 # caso ache o abstract
                                 if "descrição" in campo_texto:
@@ -124,6 +135,7 @@ def obter_dados_professor(ids_professores):
 
             resultados[nome] = {
                 "coautores": coautores,
+                "all_coautores": list(all_coautores),
                 "trabalhos": trabalhos,
             }
 
@@ -131,56 +143,6 @@ def obter_dados_professor(ids_professores):
             print(f"Erro ao processar {user_id}: {e}")
 
     return resultados
-
-
-# Não está funcionando no presente momento, o HTML recebido é diferente do visualizado na página
-# Por enquanto estamos pegando o abstract do proprio Scholar.
-def obter_abstract_externo(url_externo):
-    """
-    Acessa uma página externa do artigo para tentar capturar o abstract.
-    
-    Args:
-        url_externo (str): URL externa do artigo.
-    
-    Returns:
-        str: Abstract encontrado na página, ou "N/A" se não encontrado.
-    """
-
-    try:
-        print(f"Acessando página externa: {url_externo}")
-
-        # cabeçalho para "enganar" detectores de bot na requisição
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36"
-        }
-        response = requests.get(url_externo, headers=headers, timeout=10)
-
-        #if response.status_code == 200:
-        # linha abaixo deve ser comentada em condições normais, está sempre TRUE (1 = 1) para teste
-        if 1 == 1:
-            soup = BeautifulSoup(response.content, "html.parser")
-            
-            # exibe o HTML completo da página
-            print("\n=== HTML da página ===\n")
-            print(soup.prettify())
-            print("\n======================\n")
-
-            # procura por um campo que contenha "Abstract" no texto
-            abstract_tag = soup.find(text=lambda text: text and "abstract:" in text.lower())
-            if abstract_tag:
-                # tenta capturar o conteúdo próximo ao texto "Abstract"
-                next_div = abstract_tag.find_next("div")
-                if next_div:
-                    return next_div.text.strip()
-            else:
-                print("Texto 'abstract:' não encontrado na página.")
-
-        return "N/A"
-    except Exception as e:
-        print(f"Erro ao acessar a página externa: {e}")
-        return "N/A"
-
-
 
 
 def exibir_dados_formatados(dados):
@@ -193,6 +155,8 @@ def exibir_dados_formatados(dados):
     for professor, info in dados.items():
         print("=" * 50)
         print(f"Professor: {professor}\n")
+
+        # Exibe a lista de coautores mas referente ao perfil do docente (aquela listinha que fica na direita)
         print("Coautores:")
         if info["coautores"]:
             for coautor in info["coautores"]:
@@ -200,6 +164,16 @@ def exibir_dados_formatados(dados):
         else:
             print("  Nenhum coautor listado.")
 
+        # Exibe a lista unificada de coautores
+        print("\nTodos os coautores (perfil + trabalhos):")
+        if info["all_coautores"]:
+            for coautor in info["all_coautores"]:
+                print(f"  - {coautor}")
+        else:
+            print("  Nenhum coautor listado.")
+
+
+        # Exibe trabalho por trabalho, junto com os coautores de cada trabalho
         print("\nTrabalhos publicados:")
         for i, trabalho in enumerate(info["trabalhos"], 1):
             print(f"  {i}. {trabalho['titulo']} ({trabalho['ano']})")
@@ -223,7 +197,37 @@ def exibir_dados_formatados(dados):
             print("=" * 25 + "\n")
         print("=" * 50 + "\n")
 
+
+
+
 # IDs de exemplo
+# Fred : "G-__GDUAAAAJ"
+# Alan: "QZFWzugAAAAJ"
 ids_professores = ["G-__GDUAAAAJ"]
 dados_professores = obter_dados_professor(ids_professores)
 exibir_dados_formatados(dados_professores)
+
+
+variacoes_nomes = {
+    "Alan Valejo": {"ADB Valejo", "A Valejo"},
+    "Jo Ueyama": {"J Ueyama"}, 
+    "Alfredo Colenci Neto" : {"C Neto"},
+}
+
+
+grafo = gerar_grafo_coautoria(dados_professores, variacoes_nomes)
+
+# Visualizar o grafo
+pos = nx.spring_layout(grafo)  # Layout para distribuir os nós de forma visualmente agradável
+plt.figure(figsize=(10, 8))
+
+# Desenhar o grafo com labels
+nx.draw(grafo, pos, with_labels=True, node_color="lightblue", edge_color="gray", node_size=2000, font_size=10)
+
+# Exibir pesos nas arestas
+edge_labels = nx.get_edge_attributes(grafo, 'peso')
+nx.draw_networkx_edge_labels(grafo, pos, edge_labels=edge_labels)
+
+# Salvar como arquivo de imagem
+plt.savefig("grafo_coautoria.png", format="PNG")
+plt.close()
