@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Grafo Interativo</title>
+  <!-- Incluindo sigmaJS via CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sigma.js/1.2.1/sigma.min.js"></script>
+  <style>
+    #container {
+      width: 800px;
+      height: 600px;
+      margin: auto;
+      border: 1px solid #ccc;
+    }
+  </style>
+</head>
+<body>
+  <h1>Grafo Interativo</h1>
+  <div id="container"></div>
+  
+  <script>
+    // Busca os dados do grafo da API
+    fetch('https://ideal-space-palm-tree-v5vrqv49xv43pqjg-5000.app.github.dev/api/grafo')
+    .then(response => response.json())
+    .then(data => {
+        var s = new sigma({
+            graph: {
+                nodes: data.nodes.map((node, index) => ({
+                    id: node.id,
+                    label: node.id,
+                    x: Math.random(),
+                    y: Math.random(),
+                    size: 1,
+                    color: '#ec5148'
+                })),
+                edges: data.edges.map((edge, index) => ({
+                    id: 'e' + index,
+                    source: edge.source,
+                    target: edge.target,
+                    size: edge.peso,
+                    color: '#ccc'
+                }))
+            },
+            container: 'container',
+            settings: {
+                defaultNodeColor: '#ec5148'
+            }
+        });
+    })
+    .catch(error => console.error('Erro ao carregar o grafo:', error));
+  </script>
+</body>
+</html>
