@@ -38,7 +38,7 @@ def get_grafo():
     data = json_graph.node_link_data(grafo)
 
     formatted_data = {
-        "nodes": [{"id": node, "label": node} for node in data["nodes"]],
+        "nodes": [{"id": node["id"], "label": node.get("label", str(node["id"]))} for node in data["nodes"]],
         "edges": [{"source": edge["source"], "target": edge["target"], "weight": edge.get("peso", 1)} for edge in data["links"]]
     }
     return jsonify(formatted_data)
