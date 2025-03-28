@@ -1,13 +1,56 @@
-# 🚀 universafinity_scraper 🖥
+<h1 align="center"> 🚀 Universafinity 🖥 </h1>
 
-Esse repositório tem como objetivo conter o código do scraper a ser utilizado no projeto da criação de um sistema que permita conectar autores, co-autores e editais de pesquisa e fomento científico.
+<p align="center">
+  <img src="https://github.com/Maracujacake/universafinity_scraper/blob/main/readme_img%20(2).png" width="500" alt="Universafinity">
+</p>
 
-O código atualmente faz uso do [Scholarly](https://scholarly.readthedocs.io/en/latest/quickstart.html#) para conseguir os dados do Google Scholar de maneira ética e que não vá contra as políticas da plataforma.
+## 📌 Sobre o Projeto
 
-Os resultados atuais são:
-- A partir de uma lista de ID's de docentes (do perfil do Scholar) é possível extrair Nome, Coautores, Trabalhos e ainda, caso necessários, todos os autores destes trabalhos adquiridos.
-- Exibição amigável dos resultados
-- Tempo de execução demorado 😪
+**Universafinity** é uma ferramenta desenvolvida para a **UFSCar** com o objetivo de conectar docentes por meio de suas colaborações em trabalhos científicos. A plataforma utiliza um modelo baseado em **grafos** para representar as conexões entre professores e seus respectivos coautores.
 
+## 📜 Funcionalidades
 
-![alt text](image.png)
+- 🔎 **Busca por docentes**: Encontre professores a partir de nomes ou áreas de pesquisa.
+- 🔗 **Mapeamento de conexões**: Visualização das colaborações através de um grafo interativo.
+- 📊 **Análise de coautoria**: Identifica relações fortes entre pesquisadores com base na frequência de publicações conjuntas.
+- 📁 **Exportação de dados**: Possibilidade de exportar a rede de colaborações para análises externas.
+
+## 🚀 Tecnologias Utilizadas
+
+- **Python** 🐍 (Web Scraping, Processamento de Dados)
+- **NetworkX** 🔗 (Construção de Grafos)
+- **Flask** 🌐 (API Backend)
+- **React.js** ⚛️ (Interface Web - Opcional)
+- **MySQL** 🗄️ (Armazenamento de dados)
+
+## 📦 Instalação e Uso
+
+### 1️⃣ Clone o Repositório
+```bash
+ git clone https://github.com/Maracujacake/universafinity_scraper.git
+ cd universafinity_scraper
+```
+
+### 2️⃣ Instale as Dependências
+```bash
+ pip install -r requirements.txt
+```
+
+### 3️⃣ Execute a Ferramenta
+```bash
+ python main.py
+```
+
+## 📊 Como Funciona
+
+1. O script faz web scraping no **Google Scholar** e coleta informações sobre publicações e coautores.
+2. Os dados são processados e estruturados em um **grafo**, onde cada nó representa um docente e as arestas indicam colaborações.
+3. O usuário pode interagir com a interface web (se disponível) ou utilizar a API para acessar as informações.
+
+## 📜 Licença
+
+Este projeto é licenciado sob a **MIT License** - veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+
+## 💡 Contribuição
+
+Sinta-se à vontade para abrir **issues** e enviar **pull requests**. Qualquer sugestão para aprimoramento é bem-vinda! 😊
