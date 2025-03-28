@@ -216,18 +216,3 @@ variacoes_nomes = {
 
 
 grafo = gerar_grafo_coautoria(dados_professores, variacoes_nomes)
-
-# Visualizar o grafo
-pos = nx.spring_layout(grafo)  # Layout para distribuir os nós de forma visualmente agradável
-plt.figure(figsize=(10, 8))
-
-# Desenhar o grafo com labels
-nx.draw(grafo, pos, with_labels=True, node_color="lightblue", edge_color="gray", node_size=2000, font_size=10)
-
-# Exibir pesos nas arestas
-edge_labels = nx.get_edge_attributes(grafo, 'peso')
-nx.draw_networkx_edge_labels(grafo, pos, edge_labels=edge_labels)
-
-# Salvar como arquivo de imagem
-plt.savefig("grafo_coautoria.png", format="PNG")
-plt.close()
