@@ -10,8 +10,10 @@
     "d3": "^7.9.0",
     "graphology": "^0.26.0",
     "graphology-layout-forceatlas2": "^0.10.1",
+    "lucide-react": "^0.487.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "react-router-dom": "^7.5.0",
     "react-scripts": "5.0.1",
     "sigma": "^3.0.1",
     "web-vitals": "^2.1.4"

@@ -12,7 +12,7 @@ const GraphContainer = ({ searchTerm }) => {
 
   useEffect(() => {
     const container = document.getElementById('sigma-container');
-    if (!container) return;
+    if (!container || container.offsetWidth === 0) return;
 
     const loadGraph = async () => {
       try {
@@ -31,7 +31,7 @@ const GraphContainer = ({ searchTerm }) => {
             x: Math.random() * 100,
             y: Math.random() * 100,
             size: 5,
-            color: '#ec5148'
+            color: '#1E3A8A'
           });
         });
 
@@ -95,7 +95,7 @@ const GraphContainer = ({ searchTerm }) => {
         // Resetar cor e tamanho do nó anterior (se houver)
         if (highlightedNode && graph.hasNode(highlightedNode)) {
           graph.forEachNode((node) => {
-            graph.setNodeAttribute(node, 'color', '#ec5148');
+            graph.setNodeAttribute(node, 'color', '#1E3A8A');
             graph.setNodeAttribute(node, 'size', Math.min(5 + graph.degree(node), 20));
           });
         }
@@ -106,7 +106,7 @@ const GraphContainer = ({ searchTerm }) => {
         });
   
         // Destacar o novo nó
-        graph.setNodeAttribute(searchTerm, 'color', '#4c6cfd');
+        graph.setNodeAttribute(searchTerm, 'color', '#EF4444');
         setHighlightedNode(searchTerm);
   
         // Realçar arestas conectadas ao nó buscado
@@ -119,19 +119,21 @@ const GraphContainer = ({ searchTerm }) => {
           graph.setNodeAttribute(neighbor, 'color', '#facc15'); // amarelo vibrante
         });
   
-        // Animação pulse (senoidal)
         const baseSize = Math.min(5 + graph.degree(searchTerm), 20);
-        const amplitude = 4;
+        const amplitude = 0.4; // A faixa será de 0.9x a 1.1x
         const speed = 2;
-  
+
         const animate = (time) => {
           if (!startTime) startTime = time;
           const elapsed = (time - startTime) / 1000;
-          const newSize = baseSize + amplitude * Math.sin(elapsed * speed);
+
+          const scaleFactor = 0.9 + ((Math.sin(elapsed * speed) + 1) / 2) * amplitude;
+          const newSize = baseSize * scaleFactor;
+
           graph.setNodeAttribute(searchTerm, 'size', newSize);
           animationFrameId = requestAnimationFrame(animate);
         };
-  
+
         animationFrameId = requestAnimationFrame(animate);
       } else {
         alert('Nó não encontrado no grafo!');
