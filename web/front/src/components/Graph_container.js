@@ -3,12 +3,13 @@ import Graph from 'graphology';
 import Sigma from 'sigma';
 import forceAtlas2 from 'graphology-layout-forceatlas2';
 
-const GraphContainer = ({ searchTerm }) => {
+const GraphContainer = ({ searchTerm, setNodeList, minWeight }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [sigmaInstance, setSigmaInstance] = useState(null);
   const [graph, setGraph] = useState(null);
   const [highlightedNode, setHighlightedNode] = useState(null);
+  const [allEdges, setAllEdges] = useState([]);
 
   useEffect(() => {
     const container = document.getElementById('sigma-container');
@@ -35,12 +36,18 @@ const GraphContainer = ({ searchTerm }) => {
           });
         });
 
+        // Pega o nome de todos os nós, para passar para a SearchBar
+        const nomes = data.nodes.map(n => n.label || n.id);
+        setNodeList(nomes);
+
         // Adiciona as arestas
+        setAllEdges(data.edges);
+
         data.edges.forEach(edge => {
           try {
             newGraph.addEdge(edge.source, edge.target, {
-              size: edge.weight || 1,
-              color: '#ccc'
+              size: edge.weight,
+              color: edge.weight >= minWeight ? '#ccc' : 'transparent'
             });
           } catch (e) {
             console.warn(`Erro ao adicionar aresta ${edge.source}-${edge.target}`, e);
@@ -70,6 +77,8 @@ const GraphContainer = ({ searchTerm }) => {
         }
         container.innerHTML = '';
 
+        
+
         // Instancia o Sigma com o grafo final
         const sigma = new Sigma(newGraph, container);
         setSigmaInstance(sigma);
@@ -84,10 +93,32 @@ const GraphContainer = ({ searchTerm }) => {
     loadGraph();
   }, []);
 
+
+  useEffect(() => {
+    if (!graph) return;
+  
+    console.log('minWeight:', minWeight);
+  
+    // 1. Resetar todas as arestas
+    graph.forEachEdge((edgeKey) => {
+      graph.setEdgeAttribute(edgeKey, 'color', '#ccc');
+    });
+  
+    // 2. Se houver um nó destacado, aplicar filtro de peso nas arestas conectadas a ele
+    if (highlightedNode && graph.hasNode(highlightedNode)) {
+      graph.forEachEdge(highlightedNode, (edgeKey, attributes) => {
+        const weight = attributes.size;
+        if (weight >= minWeight) {
+          graph.setEdgeAttribute(edgeKey, 'color', '#24fc3e');
+        }
+      });
+    }
+  }, [minWeight, graph, highlightedNode]);
+
   useEffect(() => {
     let animationFrameId;
     let startTime;
-  
+    console.log('minWeight:', minWeight);
     if (searchTerm && graph && sigmaInstance) {
       const nodeExists = graph.hasNode(searchTerm);
   

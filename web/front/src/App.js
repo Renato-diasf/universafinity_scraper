@@ -6,9 +6,12 @@ import GraphContainer from './components/Graph_container';
 import SearchBar from './components/Search_Bar';
 import Grafo2 from './pages/Grafo2';
 import Grafo3 from './pages/Grafo3';
+import WeightFilter from './components/Weight_Filter';
 
 const HomePage = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [nodeList, setNodeList] = useState([]);
+  const [minWeight, setMinWeight] = useState(1);
 
   return (
     <div className="bg-[#1E3A8A] text-white">
@@ -17,8 +20,9 @@ const HomePage = () => {
         <p className="text-lg text-gray-300 max-w-2xl mx-auto mb-8">
           Um ambiente interativo para visualizar conexões acadêmicas e explorar redes de coautoria.
         </p>
-        <SearchBar onSearch={setSearchTerm} />
-        <GraphContainer searchTerm={searchTerm} />
+        <SearchBar onSearch={setSearchTerm} nodeList={nodeList} />
+        <WeightFilter minWeight={minWeight} setMinWeight={setMinWeight} />
+        <GraphContainer searchTerm={searchTerm} setNodeList={setNodeList} minWeight={minWeight} />
       </div>
     </div>
   );
