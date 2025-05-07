@@ -32,7 +32,7 @@ const GraphContainer = ({ searchTerm, setNodeList, minWeight }) => {
             x: Math.random() * 100,
             y: Math.random() * 100,
             size: 5,
-            color: '#1E3A8A'
+            color: '#f97316'
           });
         });
 
@@ -47,7 +47,7 @@ const GraphContainer = ({ searchTerm, setNodeList, minWeight }) => {
           try {
             newGraph.addEdge(edge.source, edge.target, {
               size: edge.weight,
-              color: edge.weight >= minWeight ? '#ccc' : 'transparent'
+              color: edge.weight >= minWeight ? '#facc15' : 'transparent'
             });
           } catch (e) {
             console.warn(`Erro ao adicionar aresta ${edge.source}-${edge.target}`, e);
@@ -126,14 +126,14 @@ const GraphContainer = ({ searchTerm, setNodeList, minWeight }) => {
         // Resetar cor e tamanho do nó anterior (se houver)
         if (highlightedNode && graph.hasNode(highlightedNode)) {
           graph.forEachNode((node) => {
-            graph.setNodeAttribute(node, 'color', '#1E3A8A');
+            graph.setNodeAttribute(node, 'color', '#f97316');
             graph.setNodeAttribute(node, 'size', Math.min(5 + graph.degree(node), 20));
           });
         }
   
         // Resetar cores de todas as arestas para o padrão 🧹
         graph.forEachEdge((edge) => {
-          graph.setEdgeAttribute(edge, 'color', '#ccc');
+          graph.setEdgeAttribute(edge, 'color', '#facc15');
         });
   
         // Destacar o novo nó
@@ -177,7 +177,7 @@ const GraphContainer = ({ searchTerm, setNodeList, minWeight }) => {
   }, [searchTerm, graph, sigmaInstance]);
 
   return (
-    <div className="relative w-full max-w-3xl h-[600px] mx-auto">
+    <div className="absolute inset-0 z-0">
       {loading && (
         <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-80 z-10">
           <div className="text-lg font-semibold">Carregando grafo...</div>
@@ -194,7 +194,7 @@ const GraphContainer = ({ searchTerm, setNodeList, minWeight }) => {
 
       <div
         id="sigma-container"
-        className="w-full h-full border border-gray-300 rounded-lg shadow-md bg-white"
+        className="w-full h-full"
       />
     </div>
   );

@@ -14,17 +14,24 @@ const HomePage = () => {
   const [minWeight, setMinWeight] = useState(1);
 
   return (
-    <div className="bg-[#1E3A8A] text-white">
-      <div className="container mx-auto text-center py-12 px-4">
-        <h1 className="text-5xl font-extrabold mb-4">Universafinity</h1>
-        <p className="text-lg text-gray-300 max-w-2xl mx-auto mb-8">
-          Um ambiente interativo para visualizar conexões acadêmicas e explorar redes de coautoria.
-        </p>
-        <SearchBar onSearch={setSearchTerm} nodeList={nodeList} />
-        <WeightFilter minWeight={minWeight} setMinWeight={setMinWeight} />
-        <GraphContainer searchTerm={searchTerm} setNodeList={setNodeList} minWeight={minWeight} />
-      </div>
+    <div className="relative bg-[#1E3A8A] text-white min-h-screen z-10">
+    {/* Graph no fundo */}
+    <div className="absolute inset-0 -z-10">
+      <GraphContainer searchTerm={searchTerm} setNodeList={setNodeList} minWeight={minWeight} />
     </div>
+
+    {/* Conteúdo sobreposto */}
+    <div className="container mx-auto text-center py-12 px-4 relative z-10">
+      <div className="bg-[#D1D5DB]/70 backdrop-blur-md rounded-2xl p-6 max-w-3xl mx-auto">
+          <h1 className="text-5xl font-extrabold mb-4 text-[#1E3A8A]">Universafinity</h1>
+          <p className="text-lg max-w-2xl mx-auto mb-8 text-[#1E3A8A]">
+            Um ambiente interativo para visualizar conexões acadêmicas e explorar redes de coautoria.
+          </p>
+          <SearchBar onSearch={setSearchTerm} nodeList={nodeList} />
+          <WeightFilter minWeight={minWeight} setMinWeight={setMinWeight} />
+        </div>
+      </div>
+  </div>
   );
 };
 
