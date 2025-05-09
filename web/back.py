@@ -22,7 +22,7 @@ def processar_grafo():
     global grafo_cache
     if grafo_cache is None:
         print("Gerando grafo de coautoria...")  # Para debug
-        ids_professores = ["G-__GDUAAAAJ"]
+        ids_professores = ["G-__GDUAAAAJ", "QZFWzugAAAAJ"]
         dados_professores = obter_dados_professor(ids_professores)
         variacoes_nomes = {
             "Alan Valejo": {"ADB Valejo", "A Valejo"},
