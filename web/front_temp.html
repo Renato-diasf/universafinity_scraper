@@ -1,50 +1,95 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Grafo Interativo</title>
-  <!-- Incluindo sigmaJS via CDN -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Universafinity</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/sigma.js/1.2.1/sigma.min.js"></script>
-  <style>
-    #container {
-      width: 800px;
-      height: 600px;
-      margin: auto;
-      border: 1px solid #ccc;
-    }
-  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/graphology/0.21.2/graphology.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/graphology-layout-forceatlas2/0.6.1/graphology-layout-forceatlas2.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/graphology-utilities/0.6.2/graphology-utilities.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sigma.js/2.3.0/sigma.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-force/3.0.0/d3-force.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/springy/2.8.3/springy.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/springy/2.8.3/springyui.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-  <h1>Grafo Interativo</h1>
-  <div id="container"></div>
+<body class="bg-[#47476b] text-white">
   
+  <!-- Navbar -->
+  <nav class="bg-[#7575a3] py-4 shadow-lg">
+    <div class="container mx-auto flex justify-between items-center px-6">
+      <span class="text-xl font-bold">Universafinity</span>
+      <div>
+        <a href="#" class="text-white px-4 py-2 rounded-md hover:bg-[#5a5a87] transition">Placeholder</a>
+      </div>
+    </div>
+  </nav>
+  
+  <!-- Conteúdo Principal -->
+  <div class="container mx-auto text-center py-12 px-4">
+    <h1 class="text-5xl font-extrabold mb-4">Universafinity</h1>
+    <p class="text-lg text-gray-300 max-w-2xl mx-auto mb-8">
+      Um ambiente interativo para visualizar conexões acadêmicas e explorar redes de coautoria.
+    </p>
+    
+    <!-- Grafo -->
+    <div id="container" class="w-full max-w-3xl h-[600px] mx-auto border border-gray-500 rounded-lg shadow-lg"></div>
+  </div>
+
   <script>
-    // Busca os dados do grafo da API
     fetch('http://192.168.0.73:5000/api/grafo')
-    .then(response => response.json())
-    .then(data => {
-        var s = new sigma({
-            graph: {
-                nodes: data.nodes.map((node, index) => ({
-                    id: node.id,
-                    label: node.id,
-                    x: Math.random(),
-                    y: Math.random(),
-                    size: 1,
-                    color: '#ec5148'
-                })),
-                edges: data.edges.map((edge, index) => ({
-                    id: 'e' + index,
-                    source: edge.source,
-                    target: edge.target,
-                    size: edge.peso,
-                    color: '#ccc'
-                }))
-            },
+      .then(response => response.json())
+      .then(data => {
+        const graph = new graphology.Graph();
+        
+        // Adiciona os nós ao grafo
+        data.nodes.forEach(node => {
+            graph.addNode(node.id, {
+                label: node.id,
+                x: Math.random(),
+                y: Math.random(),
+                size: 1,
+                color: '#ec5148'
+            });
+        });
+        
+        // Adiciona as arestas ao grafo
+        data.edges.forEach(edge => {
+            graph.addEdge(edge.source, edge.target, {
+                size: edge.peso,
+                color: '#ccc'
+            });
+        });
+        
+        // Aplica layout ForceAtlas2
+        forceAtlas2.assign(graph, {iterations: 100});
+        
+        // Ajusta tamanho dos nós baseado no grau de conexões
+        graph.forEachNode(node => {
+            const degree = graph.degree(node);
+            graph.setNodeAttribute(node, 'size', degree * 2 + 2);
+        });
+        
+        // Inicializa o sigma
+        const renderer = new sigma({
+            graph: graph,
             container: 'container',
             settings: {
-                defaultNodeColor: '#ec5148'
+                defaultNodeColor: '#ec5148',
+                minNodeSize: 2,
+                maxNodeSize: 20,
+                labelThreshold: 5,
             }
+        });
+        
+        // Adiciona efeito hover
+        renderer.bind('overNode', e => {
+            graph.setNodeAttribute(e.node, 'color', '#ffcc00');
+        });
+        renderer.bind('outNode', e => {
+            graph.setNodeAttribute(e.node, 'color', '#ec5148');
         });
     })
     .catch(error => console.error('Erro ao carregar o grafo:', error));
